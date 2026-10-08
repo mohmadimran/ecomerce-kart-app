@@ -26,6 +26,7 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       required: true,
+      select: false,
       trim: true,
       minlength: 8,
       validate(value) {
@@ -49,6 +50,12 @@ const userSchema = mongoose.Schema(
   // Create createdAt and updatedAt fields automatically
   {
     timestamps: true,
+    toJSON: {
+      transform(_document, returnedObject) {
+        delete returnedObject.password;
+        return returnedObject;
+      },
+    },
   }
 );
 
@@ -77,12 +84,11 @@ userSchema.methods.isPasswordMatch = async function (password) {
 /**
  * Middleware to hash password before saving user to DB
  */
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   const user = this;
   if (user.isModified("password")) {
-    user.password = await bcrypt.hash(user.password, 8);
+    user.password = await bcrypt.hash(user.password, config.bcryptSaltRounds);
   }
-  next();
 });
 
 /**

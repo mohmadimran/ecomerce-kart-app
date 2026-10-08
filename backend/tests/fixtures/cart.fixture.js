@@ -4,7 +4,7 @@ const { Cart } = require("../../src/models");
 const config = require("../../src/config/config");
 
 const emptyCart = {
-  _id: mongoose.Types.ObjectId(),
+  _id: new mongoose.Types.ObjectId(),
   email: userOne.email,
   cartItems: [],
   paymentOption: config.default_payment_option,
@@ -12,7 +12,7 @@ const emptyCart = {
 };
 
 const cartWithProductsUserOne = {
-  _id: mongoose.Types.ObjectId(),
+  _id: new mongoose.Types.ObjectId(),
   email: userOne.email,
   cartItems: [
     {
@@ -34,7 +34,7 @@ const cartWithProductsUserOne = {
 };
 
 const cartWithProductsUserTwo = {
-  _id: mongoose.Types.ObjectId(),
+  _id: new mongoose.Types.ObjectId(),
   email: userTwo.email,
   cartItems: [
     {

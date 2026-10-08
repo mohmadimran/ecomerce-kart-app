@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const pick = require("../utils/pick");
 const ApiError = require("../utils/ApiError");
 
@@ -9,7 +9,7 @@ const ApiError = require("../utils/ApiError");
  */
 const validate = (schema) => (req, res, next) => {
   // Request body should be JSON, if present
-  if (Object.keys(req.body).length !== 0 && !req.is("application/json")) {
+  if (Object.keys(req.body || {}).length !== 0 && !req.is("application/json")) {
     return next(
       new ApiError(
         httpStatus.UNSUPPORTED_MEDIA_TYPE,
@@ -37,8 +37,12 @@ const validate = (schema) => (req, res, next) => {
     return next(new ApiError(httpStatus.BAD_REQUEST, errorMessage));
   }
 
-  // Update validated fields in request with returned value
-  Object.assign(req, value);
+  // Express 5 exposes req.query as a getter, so keep validated query values separately.
+  const { query, ...requestValues } = value;
+  Object.assign(req, requestValues);
+  if (query) {
+    req.validatedQuery = query;
+  }
 
   return next();
 };

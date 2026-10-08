@@ -1,6 +1,6 @@
 const request = require("supertest");
-const faker = require("faker");
-const httpStatus = require("http-status");
+const { randomUUID } = require("node:crypto");
+const httpStatus = require("http-status").default;
 const httpMocks = require("node-mocks-http");
 const app = require("../../src/app");
 const config = require("../../src/config/config");
@@ -20,8 +20,8 @@ describe("Auth routes", () => {
     let newUser;
     beforeEach(() => {
       newUser = {
-        name: faker.name.findName(),
-        email: faker.internet.email().toLowerCase(),
+        name: "New Test User",
+        email: `new-user-${randomUUID()}@example.com`,
         password: "password1",
       };
     });

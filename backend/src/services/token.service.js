@@ -31,7 +31,6 @@
 
 
 const jwt = require("jsonwebtoken");
-const moment = require("moment");
 const config = require("../config/config");
 const { tokenTypes } = require("../config/tokens");
 
@@ -45,11 +44,11 @@ const { tokenTypes } = require("../config/tokens");
 const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   const payload = {
     sub: userId,
-    iat: moment().unix(),
+    iat: Math.floor(Date.now() / 1000),
     exp: expires,
     type,
   };
-  return jwt.sign(payload, secret);
+  return jwt.sign(payload, secret, { algorithm: "HS256" });
 };
 
 /**
@@ -58,9 +57,8 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
  * - Returns token and expiry in required format
  */
 const generateAuthTokens = async (user) => {
-  const accessTokenExpires = moment()
-    .add(config.jwt.accessExpirationMinutes, 'minutes')
-    .unix();
+  const accessTokenExpires =
+    Math.floor(Date.now() / 1000) + config.jwt.accessExpirationMinutes * 60;
   
   const accessToken = generateToken(
     user._id,
@@ -71,7 +69,7 @@ const generateAuthTokens = async (user) => {
   return {
     access: {
       token: accessToken,
-      expires: moment.unix(accessTokenExpires).toDate(),
+      expires: new Date(accessTokenExpires * 1000),
     },
   };
 };

@@ -14,6 +14,8 @@ const envVarsSchema = Joi.object()
       .valid("production", "development", "test")
       .required(),
     PORT: Joi.number().default(3000),
+    MONGO_MAX_POOL_SIZE: Joi.number().integer().min(1).max(1000).default(20),
+    TRUST_PROXY_HOPS: Joi.number().integer().min(0).max(10).default(0),
     MONGODB_URL: Joi.string().required().description("Mongo DB url"),
     JWT_SECRET: Joi.string().required().description("JWT secret key"),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number()
@@ -33,14 +35,11 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  trustProxyHops: envVars.TRUST_PROXY_HOPS,
   // Set mongoose configuration
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : ""),
-    options: {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
+    options: { maxPoolSize: envVars.MONGO_MAX_POOL_SIZE },
   },
   default_wallet_money: DEFAULT_WALLET_MONEY,
   default_payment_option: DEFAULT_PAYMENT_OPTION,

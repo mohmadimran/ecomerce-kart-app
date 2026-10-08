@@ -39,7 +39,7 @@
  * HTTP 204 - on successful product deletion
  */
 
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const catchAsync = require("../utils/catchAsync");
 const { cartService } = require("../services");
 

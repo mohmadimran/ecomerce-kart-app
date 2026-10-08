@@ -1,6 +1,5 @@
 const request = require("supertest");
-const faker = require("faker");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const app = require("../../src/app");
 const setupTestDB = require("../utils/setupTestDB");
 const { Cart, User } = require("../../src/models");
