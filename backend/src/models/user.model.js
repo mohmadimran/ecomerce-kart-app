@@ -11,6 +11,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     email: {
       type: String,
@@ -30,6 +31,9 @@ const userSchema = mongoose.Schema(
       trim: true,
       minlength: 8,
       validate(value) {
+        if (Buffer.byteLength(value, "utf8") > 72) {
+          throw new Error("Password must not exceed 72 UTF-8 bytes");
+        }
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
             "Password must contain at least one letter and one number"
@@ -41,10 +45,12 @@ const userSchema = mongoose.Schema(
       type: Number,
       required: true,
       default: 500,
+      min: 0,
     },
     address: {
       type: String,
       default: config.default_address,
+      maxlength: 500,
     },
   },
   // Create createdAt and updatedAt fields automatically

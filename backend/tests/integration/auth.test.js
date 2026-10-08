@@ -75,14 +75,14 @@ describe("Auth routes", () => {
       expect(res.status).toEqual(httpStatus.BAD_REQUEST);
     });
 
-    test("should return 200 error if email is already used", async () => {
+    test("should return 409 conflict if email is already used", async () => {
       // Ref - https://stackoverflow.com/a/53144807
       await insertUsers([userOne]);
       newUser.email = userOne.email;
 
       const res = await request(app).post("/v1/auth/register").send(newUser);
 
-      expect(res.status).toEqual(httpStatus.OK);
+      expect(res.status).toEqual(httpStatus.CONFLICT);
     });
 
     test("should return 400 error if password length is less than 8 characters", async () => {

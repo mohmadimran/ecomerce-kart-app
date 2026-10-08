@@ -2,7 +2,7 @@ const request = require("supertest");
 const httpStatus = require("http-status").default;
 const app = require("../../src/app");
 const setupTestDB = require("../utils/setupTestDB");
-const { Cart } = require("../../src/models");
+const { Cart, Product } = require("../../src/models");
 const { userOne, userTwo, insertUsers } = require("../fixtures/user.fixture");
 const {
   cartWithProductsUserOne,
@@ -18,6 +18,15 @@ const config = require("../config/config");
 
 // Setup test Mongo database, qkart-test
 setupTestDB();
+
+const checkoutProduct = {
+  _id: "5f71c1ca04c69a5874e9fd45",
+  name: "ball",
+  category: "Sports",
+  rating: 5,
+  cost: 20,
+  image: "google.com",
+};
 
 describe("Cart routes", () => {
   describe("Checkout", () => {
@@ -74,6 +83,7 @@ describe("Cart routes", () => {
     it("should return 400 if not enough wallet balance", async () => {
       const userOneWithZeroBalance = { ...userOne, walletMoney: 0 };
       await insertUsers([userOneWithZeroBalance]);
+      await Product.create(checkoutProduct);
       await insertCart([cartWithProductsUserOne]);
 
       const res = await request(app)
@@ -88,6 +98,7 @@ describe("Cart routes", () => {
 
     it("should return 204 if cart is valid", async () => {
       await insertUsers([userOne]);
+      await Product.create(checkoutProduct);
       await insertCart([cartWithProductsUserOne]);
 
       const res = await request(app)

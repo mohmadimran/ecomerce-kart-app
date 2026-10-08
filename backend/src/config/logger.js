@@ -2,7 +2,7 @@ const winston = require("winston");
 const config = require("./config");
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  level: config.logLevel,
   format:
     config.env === "production"
       ? winston.format.combine(winston.format.timestamp(), winston.format.json())

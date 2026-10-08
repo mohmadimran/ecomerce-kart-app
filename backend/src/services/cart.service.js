@@ -1,7 +1,6 @@
 const httpStatus = require("http-status").default;
 const { Cart, Product, User } = require("../models");
 const ApiError = require("../utils/ApiError");
-const config = require("../config/config");
 const mongoose = require("mongoose");
 
 
@@ -103,8 +102,9 @@ const mongoose = require("mongoose");
     }
   
     // 5. Check if product is already in cart
+    const normalizedProductId = productId.toLowerCase();
     const itemIndex = cart.cartItems.findIndex(
-      (item) => item.product._id.toString() === productId
+      (item) => item.product._id.toString() === normalizedProductId
     );
   
     if (itemIndex > -1) {
@@ -130,8 +130,9 @@ const mongoose = require("mongoose");
       throw new ApiError(httpStatus.BAD_REQUEST, "Cart not found");
     }
   
+    const normalizedProductId = productId.toLowerCase();
     const itemIndex = cart.cartItems.findIndex(
-      (item) => item.product._id.toString() === productId
+      (item) => item.product._id.toString() === normalizedProductId
     );
   
     if (itemIndex === -1) {
@@ -156,8 +157,9 @@ const mongoose = require("mongoose");
      throw new ApiError(httpStatus.BAD_REQUEST, "User does not have a cart");
    }
  
+   const normalizedProductId = productId.toLowerCase();
    const itemIndex = cart.cartItems.findIndex(
-     (item) => item.product._id.toString() === productId
+     (item) => item.product._id.toString() === normalizedProductId
    );
  
    if (itemIndex === -1) {

@@ -16,12 +16,13 @@ const productSchema = mongoose.Schema(
     cost: {
       type: Number,
       required: true,
-      trim: true,
+      min: 0,
     },
     rating: {
       type: Number,
       required: true,
-      trim: true,
+      min: 0,
+      max: 5,
     },
     image: {
       type: String,

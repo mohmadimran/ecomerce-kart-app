@@ -16,7 +16,7 @@ const ApiError = require("../utils/ApiError");
  */
 const getUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const { q } = req.query;
+  const { q } = req.validatedQuery || {};
 
   let user;
 

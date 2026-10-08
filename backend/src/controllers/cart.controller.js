@@ -72,8 +72,6 @@ const updateProductInCart = catchAsync(async (req, res) => {
   );
 
   return res.status(httpStatus.OK).send(cart); // Return 200 OK
-
-  res.status(httpStatus.CREATED).send(cart);
 });
 
 /**

@@ -12,16 +12,18 @@ const getUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
-
-}
+  query: Joi.object().keys({
+    q: Joi.string().valid("address"),
+  }),
+};
 const setAddress = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    address: Joi.string().required().min(20),
+    address: Joi.string().trim().required().min(20).max(500),
   }),
-}
+};
 
 module.exports = {
   getUser,
