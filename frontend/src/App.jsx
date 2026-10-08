@@ -10,7 +10,7 @@ import Checkout from "./components/Checkout";
 import Thanks from "./components/Thanks";
 
 export const config = {
-endpoint:"https://ecomerce-kart-app.onrender.com/v1",
+  endpoint: import.meta.env.VITE_API_BASE_URL || "/v1",
 };
 
 export default function App() {

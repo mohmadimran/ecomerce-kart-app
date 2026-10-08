@@ -21,19 +21,25 @@ npm ci --omit=dev
 npm start
 ```
 
-## Docker
+## Docker Compose
 
-Build the backend image from the repository root:
+The repository root Compose configuration builds and runs both the React frontend and Node.js backend. Nginx serves the frontend and proxies `/v1` requests to the backend container. The backend port is only exposed on the internal Compose network.
+
+1. Copy `.env.example` to `.env` in the repository root.
+2. Set `MONGODB_URL` to a MongoDB replica set or Atlas URI and replace `JWT_SECRET` with a random secret of at least 32 characters.
+3. Run from the repository root:
 
 ```sh
-docker build -f backend/Dockerfile -t qkart-backend:local backend
+docker compose up --build
 ```
 
-Run it with the production environment variables listed above. The image runs as the unprivileged `node` user, contains production dependencies only, and checks readiness through `/health/ready`.
+Open `http://localhost:8080` (or the port configured with `FRONTEND_PORT`). Compose builds from both `frontend/` and `backend/`. It does not start MongoDB; use an external replica set because checkout requires transactions. If you change `FRONTEND_PORT`, set `CORS_ORIGINS` to the matching origin too. Stop the app with `docker compose down`.
+
+To build only the backend image, run `docker build -t qkart-backend:local ./backend`. The image runs as the unprivileged `node` user, contains production dependencies only, and checks readiness through `/health/ready`.
 
 ## CI and image publishing
 
-The GitHub Actions workflow checks JavaScript syntax, runs backend integration tests against an isolated MongoDB replica set, and builds the Docker image for pushes and pull requests. A successful push to `main` or a `backend-v*.*.*` tag also publishes `ghcr.io/<owner>/<repository>-backend` to GitHub Container Registry (GHCR). No hosting provider deployment is configured; point your hosting service at the published image to deploy it.
+The GitHub Actions workflow checks backend syntax, runs backend integration tests against an isolated MongoDB replica set, builds the frontend and both Docker images for pushes and pull requests. A successful push to `main` or a `v*.*.*` tag also publishes `ghcr.io/<owner>/<repository>-backend` and `ghcr.io/<owner>/<repository>-frontend` to GitHub Container Registry (GHCR). No hosting provider deployment is configured; point your hosting service at the published images to deploy them.
 
 The process exits with a nonzero status if startup configuration or the MongoDB connection fails. It handles `SIGINT` and `SIGTERM` by draining HTTP connections and disconnecting from MongoDB. Configure the platform to send one of these signals during shutdown.
 
