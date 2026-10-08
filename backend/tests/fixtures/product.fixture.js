@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Product } = require("../../src/models");
 
 const productOne = {
-  _id: mongoose.Types.ObjectId(),
+  _id: new mongoose.Types.ObjectId(),
   name: "bat",
   category: "Sports",
   rating: 3,
@@ -11,7 +11,7 @@ const productOne = {
 };
 
 const productTwo = {
-  _id: mongoose.Types.ObjectId(),
+  _id: new mongoose.Types.ObjectId(),
   name: "ball",
   category: "Sports",
   rating: 3,

@@ -7,6 +7,14 @@ const getProduct = {
   }),
 };
 
+const getProducts = {
+  query: Joi.object().keys({
+    limit: Joi.number().integer().min(1).max(100),
+    after: Joi.string().custom(objectId),
+  }).with("after", "limit"),
+};
+
 module.exports = {
   getProduct,
+  getProducts,
 };

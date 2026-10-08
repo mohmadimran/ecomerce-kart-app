@@ -1,4 +1,4 @@
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const ApiError = require("../utils/ApiError");
 const catchAsync = require("../utils/catchAsync");
 const { productService } = require("../services");
@@ -29,7 +29,8 @@ const getProductById = catchAsync(async (req, res) => {
 });
 
 /**
- * Get list of all products (Not authenticated route)
+ * Get products (Not authenticated route).
+ * Optional cursor pagination: ?limit=25&after=<last product _id>.
  *
  * Example responses:
  * HTTP 200
@@ -57,7 +58,7 @@ const getProductById = catchAsync(async (req, res) => {
  *
  */
 const getProducts = catchAsync(async (req, res) => {
-  const products = await productService.getProducts();
+  const products = await productService.getProducts(req.validatedQuery);
   res.send(products);
 });
 

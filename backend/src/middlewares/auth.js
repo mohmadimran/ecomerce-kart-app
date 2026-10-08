@@ -1,8 +1,4 @@
-const httpStatus = require("http-status");
-const jwt = require("jsonwebtoken");
-const config = require("../config/config");
-const { tokenTypes } = require("../config/tokens");
-const { User } = require("../models");
+const httpStatus = require("http-status").default;
 const ApiError = require("../utils/ApiError");
 const passport = require("passport");
 

@@ -1,7 +1,8 @@
-const httpStatus = require("http-status");
-const { Cart, Product } = require("../models");
+const httpStatus = require("http-status").default;
+const { Cart, Product, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const config = require("../config/config");
+const mongoose = require("mongoose");
 
 
 /**
@@ -63,7 +64,7 @@ const config = require("../config/config");
   * Get the cart for a user by email
   */
  const getCartByUser = async (user) => {
-   const cart = await Cart.findOne({ email: user.email });
+   const cart = await Cart.findOne({ email: user.email }).lean();
  
    if (!cart) {
      throw new ApiError(httpStatus.NOT_FOUND, "User does not have a cart");
@@ -78,7 +79,7 @@ const config = require("../config/config");
   */
   const addProductToCart = async (user, productId, quantity) => {
     // 1. Find the product
-    const productData = await Product.findById(productId);
+    const productData = await Product.findById(productId).lean();
     if (!productData) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Product not found");
     }
@@ -90,7 +91,7 @@ const config = require("../config/config");
     if (!cart) {
       cart = await Cart.create({
         email: user.email,
-        cartItems: [{ product: productData.toObject(), quantity }],
+        cartItems: [{ product: productData, quantity }],
       });
   
       // 4. Fail safe if creation fails 
@@ -112,7 +113,7 @@ const config = require("../config/config");
   
     // 6. Add product to cart
     cart.cartItems.push({
-      product: productData.toObject(),
+      product: productData,
       quantity,
     });
   
@@ -172,34 +173,45 @@ const config = require("../config/config");
 
 
 const checkout = async (user) => {
-  const cart = await Cart.findOne({ email: user.email });
+  const session = await mongoose.startSession();
+  try {
+    await session.withTransaction(async () => {
+      const cart = await Cart.findOne({ email: user.email }).session(session);
+      const currentUser = await User.findOne({ email: user.email }).session(session);
 
-  if (!cart) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User does not have a cart");
+      if (!cart) throw new ApiError(httpStatus.NOT_FOUND, "User does not have a cart");
+      if (!cart.cartItems?.length) throw new ApiError(httpStatus.BAD_REQUEST, "Cart is empty");
+      if (!currentUser?.hasSetNonDefaultAddress()) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Address is not set");
+      }
+
+      const productIds = cart.cartItems.map((item) => item.product._id);
+      const currentProducts = await Product.find({ _id: { $in: productIds } })
+        .select("cost")
+        .session(session)
+        .lean();
+      const currentPrices = new Map(currentProducts.map((product) => [String(product._id), product.cost]));
+      const totalAmount = cart.cartItems.reduce((total, item) => {
+        const price = currentPrices.get(String(item.product._id));
+        if (price == null) throw new ApiError(httpStatus.CONFLICT, "A product in the cart is no longer available");
+        return total + price * item.quantity;
+      }, 0);
+
+      const debit = await User.updateOne(
+        { _id: currentUser._id, walletMoney: { $gte: totalAmount } },
+        { $inc: { walletMoney: -totalAmount } },
+        { session }
+      );
+      if (debit.matchedCount !== 1) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Insufficient wallet balance");
+      }
+
+      cart.cartItems = [];
+      await cart.save({ session });
+    });
+  } finally {
+    await session.endSession();
   }
-
-  if (!cart.cartItems || cart.cartItems.length === 0) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Cart is empty");
-  }
-
-  if (!user.hasSetNonDefaultAddress()) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Address is not set");
-  }
-  
-  const totalAmount = cart.cartItems.reduce(
-    (acc, item) => acc + item.product.cost * item.quantity,
-    0
-  );
-
-  if (user.walletMoney < totalAmount) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Insufficient wallet balance");
-  }
-
-  user.walletMoney -= totalAmount;
-  await user.save();
-
-  cart.cartItems = [];
-  await cart.save();
 };
 
 module.exports = {

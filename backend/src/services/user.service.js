@@ -1,5 +1,5 @@
 const { User } = require("../models");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const ApiError = require("../utils/ApiError");
 
 /**
@@ -9,7 +9,7 @@ const ApiError = require("../utils/ApiError");
  * @returns {Promise<User>}
  */
 async function getUserById(id) {
-  return await User.findById(id);
+  return User.findById(id);
 }
 
 /**
@@ -19,7 +19,7 @@ async function getUserById(id) {
  * @returns {Promise<User>}
  */
 async function getUserByEmail(email) {
-  return await User.findOne({ email });
+  return User.findOne({ email }).select("+password");
 }
 
 /**
@@ -31,10 +31,18 @@ async function getUserByEmail(email) {
  */
 async function createUser(userBody) {
   if (await User.isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.OK, "Email already taken");
+    throw new ApiError(httpStatus.CONFLICT, "Email already taken");
   }
 
-  return await User.create(userBody);
+  try {
+    return await User.create(userBody);
+  } catch (error) {
+    // The unique index is the source of truth when concurrent registrations race.
+    if (error.code === 11000) {
+      throw new ApiError(httpStatus.CONFLICT, "Email already taken");
+    }
+    throw error;
+  }
 }
 
 /**
@@ -45,7 +53,7 @@ async function createUser(userBody) {
  */
 
 const getUserAddressById = async (id) => {
-  return await User.findOne(
+  return User.findOne(
     { _id: id },
     { email: 1, address: 1 }
   );

@@ -1,4 +1,4 @@
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const { userOne } = require("../fixtures/user.fixture");
 const { Cart, Product } = require("../../src/models");
 const { cartService } = require("../../src/services");

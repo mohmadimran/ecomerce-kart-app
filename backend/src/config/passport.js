@@ -25,6 +25,7 @@ const { User } = require("../models");
 const jwtOptions = {
   secretOrKey: config.jwt.secret,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  algorithms: ["HS256"],
 };
 
 // Verify Callback for JWT Strategy
