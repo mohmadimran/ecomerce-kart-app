@@ -16,7 +16,7 @@ router.post(
 
 router.put(
   "/",auth,
-  validate(cartValidation.addProductToCart),
+  validate(cartValidation.updateProductInCart),
   cartController.updateProductInCart
 );
 

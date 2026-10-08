@@ -19,7 +19,7 @@ async function getUserById(id) {
  * @returns {Promise<User>}
  */
 async function getUserByEmail(email) {
-  return User.findOne({ email }).select("+password");
+  return User.findOne({ email: email.trim().toLowerCase() }).select("+password");
 }
 
 /**
@@ -30,12 +30,13 @@ async function getUserByEmail(email) {
  * @returns {Promise<User>}
  */
 async function createUser(userBody) {
-  if (await User.isEmailTaken(userBody.email)) {
+  const normalizedEmail = userBody.email.trim().toLowerCase();
+  if (await User.isEmailTaken(normalizedEmail)) {
     throw new ApiError(httpStatus.CONFLICT, "Email already taken");
   }
 
   try {
-    return await User.create(userBody);
+    return await User.create({ ...userBody, email: normalizedEmail });
   } catch (error) {
     // The unique index is the source of truth when concurrent registrations race.
     if (error.code === 11000) {

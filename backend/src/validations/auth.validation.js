@@ -10,10 +10,10 @@ const { password } = require("./custom.validation");
 const register = {
   body: Joi.object().keys({
     name: Joi.string().trim().min(1).max(100).required(),
-    email: Joi.string().trim().email().max(254).required(),
+    email: Joi.string().trim().lowercase().email().max(254).required(),
     password: Joi.string()
       .min(8)
-      .pattern(new RegExp('^(?=.*[a-zA-Z])(?=.*[0-9])')) // At least 1 letter and 1 number
+      .custom(password)
       .required(),
   }),
 };
@@ -24,7 +24,7 @@ const register = {
  */
  const login = {
   body: Joi.object().keys({
-    email: Joi.string().trim().email().max(254).required(),
+    email: Joi.string().trim().lowercase().email().max(254).required(),
     password: Joi.string().required().custom(password),
   }),
 };

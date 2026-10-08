@@ -5,6 +5,8 @@ const cartSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    trim: true,
+    lowercase: true,
     unique: true,
   },
   paymentOption: {
@@ -22,6 +24,11 @@ const cartSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 1,
+        max: 10000,
+        validate: {
+          validator: Number.isInteger,
+          message: "Quantity must be a whole number",
+        },
       },
     },
   ],
