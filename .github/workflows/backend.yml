@@ -107,6 +107,7 @@ jobs:
         env:
           NODE_ENV: test
           MONGODB_URL: mongodb://127.0.0.1:27017/qkart?replicaSet=rs0
+          JWT_SECRET: ci-test-secret-with-more-than-32-characters
 
       - name: Run backend integration tests
         working-directory: backend
