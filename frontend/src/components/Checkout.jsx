@@ -2,7 +2,7 @@ import { Button, message, Radio, Row, Col } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { config } from "../App";
+import { config } from "../config";
 import Cart from "./Cart";
 import "./Checkout.css";
 import Footer from "./Footer";
@@ -33,7 +33,6 @@ const Checkout = () => {
   // State variables
   const [products, setProducts] = useState([]);
   const [address, setAddress] = useState("");
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [newAddress, setNewAddress] = useState("");
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -88,7 +87,7 @@ const Checkout = () => {
 
     try {
       response = await (await fetch(`${config.endpoint}/products`)).json();
-    } catch (e) {
+    } catch {
       errored = true;
     }
 
@@ -124,7 +123,7 @@ const Checkout = () => {
           }
         )
       ).json();
-    } catch (e) {
+    } catch {
       errored = true;
     }
 
@@ -164,7 +163,7 @@ const Checkout = () => {
           }
         )
       ).json();
-    } catch (e) {
+    } catch {
       errored = true;
     }
 
@@ -178,38 +177,6 @@ const Checkout = () => {
       }
     }
   }, [newAddress, validateResponse, getAddresses]);
-
-  /**
-   * Perform the API call to delete an address for the user
-   */
-  const deleteAddress = useCallback(async (addressId) => {
-    let response = {};
-    let errored = false;
-
-    setLoading(true);
-
-    try {
-      response = await (
-        await fetch(`${config.endpoint}/user/addresses/${addressId}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
-      ).json();
-    } catch (e) {
-      errored = true;
-    }
-
-    setLoading(false);
-
-    if (validateResponse(errored, response, "delete address")) {
-      if (response) {
-        message.success("Address deleted");
-        await getAddresses();
-      }
-    }
-  }, [validateResponse, getAddresses]);
 
   /**
    * Perform the API call to place an order
@@ -228,9 +195,8 @@ const Checkout = () => {
           "Content-Type": "application/json",
         },
       });
-    } catch (e) {
+    } catch {
       errored = true;
-      console.log(e);
     }
 
     setLoading(false);

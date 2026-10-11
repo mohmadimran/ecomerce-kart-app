@@ -48,8 +48,8 @@ describe("User test", () => {
 
       let userResponse = await userService.createUser(userOne);
       // Check if the User.create() method got called by checking the mock function
-      expect(createMock).toBeCalled();
-      expect(isEmailTakenMock).toBeCalled();
+      expect(createMock).toHaveBeenCalled();
+      expect(isEmailTakenMock).toHaveBeenCalled();
 
       expect(userResponse._id).toEqual(userOne._id);
       expect(userResponse.name).toBe(userOne.name);
