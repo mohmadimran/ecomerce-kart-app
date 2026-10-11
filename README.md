@@ -56,7 +56,7 @@ To add the repeatable sample catalog to the configured database, run this from `
 npm run seed:products
 ```
 
-The seed command inserts only missing original and sample products and leaves existing product records unchanged. Set `MONGODB_URL` to the database you intend to populate before running it.
+The seed command inserts missing original and sample products. It preserves existing catalog entries, except for repairing the known invalid `google.com` image on the legacy bat product. Set `MONGODB_URL` to the database you intend to populate before running it.
 
 ### 2. Configure and start the storefront
 
@@ -111,7 +111,7 @@ The backend integration tests require a dedicated disposable MongoDB test databa
 
 ## Responsive layout
 
-The product listing uses responsive Ant Design grid spans, and the global stylesheet includes a breakpoint at 768px. The current styles also contain fixed-width or fixed-padding rules in the header, authentication forms, and checkout address input. Check those screens at narrow viewport sizes before treating the storefront as fully mobile-ready.
+The product listing uses responsive Ant Design grid spans, and the global stylesheet includes a breakpoint at 768px. The home, login, registration, product, checkout, and order confirmation routes were smoke-tested at a 390px viewport with no horizontal overflow. Repeat browser and device checks for the browsers and devices you support before release.
 
 ## Docker Compose
 

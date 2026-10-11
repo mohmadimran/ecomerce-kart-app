@@ -23,7 +23,7 @@ npm ci
 npm run seed:products
 ```
 
-The command is safe to rerun: it inserts missing sample products and does not overwrite existing products. It restores the original six catalog products with their historical IDs as well as the sample catalog. Confirm that `MONGODB_URL` points to the intended database before running it.
+The command is safe to rerun: it inserts missing products without replacing existing catalog entries. It restores the original six catalog products with their historical IDs and sample catalog, and replaces the known invalid `google.com` image on the legacy bat entry. Confirm that `MONGODB_URL` points to the intended database before running it.
 
 Install and start the production application from this directory:
 
