@@ -14,6 +14,17 @@ Use Node.js 20.19 or newer. Configure the following environment variables in the
 
 Checkout uses a MongoDB transaction to debit the wallet and empty the cart as one operation. The database must support transactions, which requires a replica set (including a single-node replica set for self-hosted MongoDB).
 
+## Sample product catalog
+
+The API does not seed products automatically. To add the sample catalog, configure `MONGODB_URL` in `backend/.env`, then run from this directory:
+
+```sh
+npm ci
+npm run seed:products
+```
+
+The command is safe to rerun: it inserts missing sample products and does not overwrite existing products. Confirm that `MONGODB_URL` points to the intended database before running it.
+
 Install and start the production application from this directory:
 
 ```sh

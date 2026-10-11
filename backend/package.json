@@ -9,6 +9,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "check": "node scripts/check-syntax.js",
+    "seed:products": "node scripts/seed-products.js",
     "test": "jest --runInBand"
   },
   "dependencies": {

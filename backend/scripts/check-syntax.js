@@ -3,7 +3,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const backendDirectory = path.resolve(__dirname, "..");
-const roots = ["index.js", "jest.config.js", "src", "tests"];
+const roots = ["index.js", "jest.config.js", "scripts", "src", "tests"];
 const files = [];
 
 const collectJavaScriptFiles = (target) => {
