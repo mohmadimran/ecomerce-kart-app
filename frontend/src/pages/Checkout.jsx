@@ -3,46 +3,22 @@ import TextArea from "antd/lib/input/TextArea";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "../config";
-import Cart from "./Cart";
+import Cart from "../components/Cart";
 import "./Checkout.css";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
-/**
- * @typedef {Object} Product
- * @property {string} name - The name or title of the product
- * @property {string} category - The category that the product belongs to
- * @property {number} cost - The price to buy the product
- * @property {number} rating - The aggregate rating of the product (integer out of five)
- * @property {string} image - Contains URL for the product image
- * @property {string} _id - Unique ID for the product
- */
-
-/**
- * @typedef {Object} Address
- * @property {string} _id - Unique ID for the address
- * @property {string} address - Full address string
- */
-
-/**
- * Checkout component handles the Checkout page UI and functionality
- */
 const Checkout = () => {
   const navigate = useNavigate();
-  
-  // State variables
+
   const [products, setProducts] = useState([]);
   const [address, setAddress] = useState("");
   const [newAddress, setNewAddress] = useState("");
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
-  
-  // Refs
+
   const cartRef = useRef(null);
 
-  /**
-   * Check the response of the getProducts() API call to be valid and handle any failures along the way
-   */
   const validateGetProductsResponse = useCallback((errored, response) => {
     if (errored || (!response.length && !response.message)) {
       message.error(
@@ -59,9 +35,6 @@ const Checkout = () => {
     return true;
   }, []);
 
-  /**
-   * Check the response of other API calls to be valid and handle any failures along the way
-   */
   const validateResponse = useCallback((errored, response, couldNot) => {
     if (errored) {
       message.error(
@@ -76,9 +49,6 @@ const Checkout = () => {
     return true;
   }, []);
 
-  /**
-   * Perform the API call to fetch all products from backend
-   */
   const getProducts = useCallback(async () => {
     let response = {};
     let errored = false;
@@ -100,9 +70,6 @@ const Checkout = () => {
     }
   }, [validateGetProductsResponse]);
 
-  /**
-   * Perform the API call to fetch the user's addresses from backend
-   */
   const getAddresses = useCallback(async () => {
     let response = {};
     let errored = false;
@@ -136,9 +103,6 @@ const Checkout = () => {
     }
   }, [validateResponse]);
 
-  /**
-   * Perform the API call to add an address for the user
-   */
   const addAddress = useCallback(async () => {
     let response = {};
     let errored = false;
@@ -178,12 +142,8 @@ const Checkout = () => {
     }
   }, [newAddress, validateResponse, getAddresses]);
 
-  /**
-   * Perform the API call to place an order
-   */
   const checkout = useCallback(async () => {
-    let response = {};
-    let errored = false;
+    let response;
 
     setLoading(true);
 
@@ -195,20 +155,31 @@ const Checkout = () => {
           "Content-Type": "application/json",
         },
       });
-    } catch {
-      errored = true;
+    } catch (error) {
+      console.error(error);
+      validateResponse(true, {}, "place order");
+      return;
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
 
     let data;
     if (response.status !== 204) {
-      data = await response.json();
+      try {
+        data = await response.json();
+      } catch (error) {
+        console.error(error);
+        validateResponse(true, {}, "place order");
+        return;
+      }
     }
-    if (response.status === 204 || validateResponse(errored, data)) {
+    if (!response.ok && response.status !== 204) {
+      validateResponse(false, data?.message ? data : { message: "Unable to place order" }, "place order");
+      return;
+    }
+    if (response.status === 204 || validateResponse(false, data, "place order")) {
       message.success("Order placed");
 
-      console.log(cartRef.current?.calculateTotal());
       localStorage.setItem(
         "balance",
         parseInt(localStorage.getItem("balance")) -
@@ -219,14 +190,10 @@ const Checkout = () => {
     }
   }, [validateResponse, navigate]);
 
-  /**
-   * Function that is called when the user clicks on the place order button
-   */
   const order = useCallback(() => {
     checkout();
   }, [checkout]);
 
-  // ComponentDidMount equivalent
   useEffect(() => {
     const initializeCheckout = async () => {
       if (localStorage.getItem("username") && localStorage.getItem("token")) {
@@ -250,13 +217,12 @@ const Checkout = () => {
 
   return (
     <>
-      {/* Display Header */}
+
       <Header />
 
-      {/* Display Checkout page content */}
       <div className="checkout-container">
         <Row>
-          {/* Display checkout instructions */}
+
           <Col xs={{ span: 24, order: 2 }} md={{ span: 18, order: 1 }}>
             <div className="checkout-shipping">
               <h1 style={{ marginBottom: "-10px" }}>Shipping</h1>
@@ -266,7 +232,6 @@ const Checkout = () => {
 
               <p>Shipping Address</p>
 
-              {/* Display the "Shipping" section */}
               <div className="address-section">
                 {address.length ? (
                   <div className="address-box">
@@ -279,7 +244,7 @@ const Checkout = () => {
                 )}
 
                 <div className="checkout-row">
-                  {/* Text input field to type a new address */}
+
                   <div>
                     <TextArea
                       className="new-address"
@@ -290,7 +255,6 @@ const Checkout = () => {
                     />
                   </div>
 
-                  {/* Button to submit address added */}
                   <div>
                     <Button type="primary" onClick={addAddress}>
                       {address ? "Update Address" : "Add new address"}
@@ -301,7 +265,6 @@ const Checkout = () => {
 
               <br />
 
-              {/* Display the "Pricing" section */}
               <div>
                 <h1 style={{ marginBottom: "-10px" }}>Pricing</h1>
 
@@ -319,7 +282,6 @@ const Checkout = () => {
 
               <br />
 
-              {/* Button to confirm order */}
               <Button
                 className="ant-btn-success"
                 loading={loading}
@@ -331,7 +293,6 @@ const Checkout = () => {
             </div>
           </Col>
 
-          {/* Display the cart */}
           <Col
             xs={{ span: 24, order: 1 }}
             md={{ span: 6, order: 2 }}
@@ -344,6 +305,7 @@ const Checkout = () => {
                   products={products}
                   token={localStorage.getItem("token")}
                   checkout={true}
+                  navigate={navigate}
                 />
               )}
             </div>
@@ -351,7 +313,6 @@ const Checkout = () => {
         </Row>
       </div>
 
-      {/* Display the footer */}
       <Footer />
     </>
   );

@@ -1,77 +1,48 @@
 import { Button } from "antd";
-import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 
-export default class Header extends React.Component {
-  root = () => {
-    this.props.history.push("/");
-  };
+export default function Header({ children }) {
+  const navigate = useNavigate();
+  const username = localStorage.getItem("username");
 
-  explore = () => {
-    this.props.history.push("/products");
-  };
-
-  register = () => {
-    this.props.history.push("/register");
-  };
-
-  login = () => {
-    this.props.history.push("/login");
-  };
-
-  logout = () => {
+  const logout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("token");
-    this.props.history.push("/");
+    navigate("/");
   };
 
-  render() {
-    return (
-      <div className="header">
-        {/* Shows Qkart title image */}
-        <div className="header-title" onClick={this.root}>
-          <img src="icon.svg" alt="QKart-icon"></img>
-        </div>
+  return (
+    <header className="header">
+      <Link className="header-title" to="/" aria-label="QKart home">
+        <img src="icon.svg" alt="QKart" />
+      </Link>
 
-        {this.props.children}
+      {children}
 
-        {/* Display links based on if the user's logged in or not */}
-        <div className="header-action">
-          {localStorage.getItem("username") ? (
-            <>
-              <img
-                src="avatar.png"
-                alt="profile"
-                className="profile-image"
-              ></img>
-
-              <div className="header-info">
-                {localStorage.getItem("username")}
-              </div>
-
-              <Button type="primary" onClick={this.logout}>
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <div className="header-link" onClick={this.explore}>
-                Explore
-              </div>
-
-              <div className="header-link" onClick={this.login}>
-                Login
-              </div>
-
-              <div className="header-link">
-                <Button type="primary" onClick={this.register}>
-                  Register
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
+      <nav className="header-action">
+        {username ? (
+          <>
+            <img src="avatar.png" alt="" className="profile-image" />
+            <div className="header-info">{username}</div>
+            <Button type="primary" onClick={logout}>
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link className="header-link" to="/products">
+              Explore
+            </Link>
+            <Link className="header-link" to="/login">
+              Login
+            </Link>
+            <Link className="header-link" to="/register">
+              <Button type="primary">Register</Button>
+            </Link>
+          </>
+        )}
+      </nav>
+    </header>
+  );
 }
