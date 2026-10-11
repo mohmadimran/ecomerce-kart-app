@@ -1,16 +1,39 @@
 .home-buttons {
   display: flex;
   justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
 }
 .btn-block {
-  width: max-content;
-  margin: 10px;
+  width: 100%;
+}
+.home-buttons > a {
+  flex: 1 1 140px;
+  min-width: 0;
 }
 .home-welcome-text {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .home-welcome-text img {
-  margin: 3px 10px 0px 10px;
+  max-width: min(42vw, 150px);
+  height: auto;
+  margin: 3px 0 0;
+}
+
+@media (max-width: 520px) {
+  .home-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .home-buttons > a {
+    flex-basis: auto;
+    width: 100%;
+  }
 }

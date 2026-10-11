@@ -8,7 +8,7 @@
   */
   min-height: calc(100vh - 170px);
   margin-top: 70px;
-  padding: 1.5em 0em;
+  padding: 1.5em 0.75em;
 }
 .search-cart {
   margin-top: 70px;
@@ -18,5 +18,21 @@
 
 /* Set width for the search bar */
 span.ant-input-search {
-  width: 30%;
+  width: clamp(180px, 30vw, 420px);
+}
+
+@media (max-width: 767px) {
+  .search-container {
+    min-height: auto;
+    margin-top: 64px;
+    padding: 1rem 0.5rem;
+  }
+
+  .search-cart {
+    margin-top: 0;
+  }
+
+  span.ant-input-search {
+    width: clamp(150px, 36vw, 260px);
+  }
 }

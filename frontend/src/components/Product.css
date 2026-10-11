@@ -1,5 +1,6 @@
 .product {
-  margin: 1em 2em;
+  width: calc(100% - 2em);
+  margin: 1em auto;
   overflow: hidden;
 }
 
@@ -13,8 +14,20 @@
 }
 
 .product-image {
-  height: 250px;
+  height: clamp(170px, 22vw, 250px);
   width: 100%;
+}
+
+@media (max-width: 575px) {
+  .product {
+    width: calc(100% - 1em);
+    margin: 0.5em auto;
+  }
+
+  .product-info-text,
+  .product-info-utility {
+    padding: 0.85em;
+  }
 }
 .product-image img {
   object-fit: cover;

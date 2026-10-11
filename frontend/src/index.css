@@ -4,12 +4,21 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 .App {
-  font-family: "Montserrat";
-  height: 100vh;
+  min-height: 100vh;
+  font-family: "Montserrat", sans-serif;
 }
 
 .input-field {
@@ -23,7 +32,9 @@ body {
 .flex-container {
   display: flex;
   align-items: center;
-  height: 100vh;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 90px 24px 40px;
 }
 
 hr {
@@ -31,10 +42,9 @@ hr {
 }
 
 .container {
-  width: 500px;
+  width: min(100%, 500px);
   margin: 0 auto;
-  padding: 10em 4em;
-  box-sizing: content-box;
+  padding: clamp(2rem, 7vw, 5rem) clamp(1.25rem, 6vw, 4rem);
   text-align: center;
   border-radius: 4px;
 
@@ -42,10 +52,9 @@ hr {
 }
 
 .container-fullpage {
-  width: 50em;
+  width: min(100%, 50rem);
   margin: 0 auto;
-  padding: 7em 2em 2em 2em;
-  box-sizing: content-box;
+  padding: 7rem 2rem 2rem;
   text-align: left;
 }
 
@@ -62,20 +71,27 @@ h1 {
 }
 
 .btn-block {
-  margin-bottom: 0.5em;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
-  body {
-    font-size: 12px !important;
-  }
-
   .container {
-    width: calc(100% - 10em);
+    width: 100%;
   }
 
   .container-fullpage {
-    width: calc(100% - 4em);
+    width: 100%;
+    padding: 6rem 1.25rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .flex-container {
+    padding: 86px 16px 28px;
+  }
+
+  .container {
+    padding: 2rem 1.25rem;
   }
 }
 

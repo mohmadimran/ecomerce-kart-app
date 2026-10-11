@@ -1,5 +1,5 @@
 .checkout-shipping {
-  padding: 2em;
+  padding: 2em clamp(1rem, 3vw, 2em);
   /* Reduce 70px of header and 100px of footer
   ** Make footer display at bottom even if less content on main page
   */
@@ -9,7 +9,10 @@
   padding: 70px 0em 0em 0em;
 }
 .checkout-row {
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
   margin: 1.5em auto;
 }
 
@@ -30,17 +33,15 @@
   padding: 20px;
   white-space: pre-wrap;
   border: 1px solid #999;
-  width:50%;
-  max-width: 420px;
+  width: min(100%, 420px);
 }
 .address-text {
   width: 100%;
 }
 
 .new-address {
-  width: 30em;
-  margin-right: 1em;
-  margin-bottom: 1em;
+  width: min(100%, 30em);
+  margin-bottom: 0;
 }
 
 label.ant-radio-button-wrapper {
@@ -57,4 +58,27 @@ label.ant-radio-button-wrapper {
   /* height: 100vh; */
   background: #f6f8fa;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 767px) {
+  .checkout-container {
+    padding-top: 64px;
+  }
+
+  .checkout-shipping {
+    min-height: 0;
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .address-box {
+    padding: 1rem;
+  }
+
+  .new-address {
+    width: 100%;
+  }
+
+  .checkout-cart {
+    box-shadow: none;
+  }
 }

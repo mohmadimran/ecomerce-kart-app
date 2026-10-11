@@ -1,10 +1,20 @@
 .thanks-container {
   background: #dcffe4;
-  margin: 120px auto;
-  width: max-content;
-  padding: 5em;
-  box-sizing: content-box;
+  margin: 120px auto 2rem;
+  width: min(100% - 2rem, 680px);
+  padding: clamp(2rem, 7vw, 5em);
   text-align: center;
+}
+
+@media (max-width: 520px) {
+  .thanks-container {
+    margin-top: 90px;
+    padding: 2rem 1.25rem;
+  }
+
+  .thanks-line {
+    font-size: 1rem;
+  }
 }
 .thanks-line {
   font-size: 1.25em;
