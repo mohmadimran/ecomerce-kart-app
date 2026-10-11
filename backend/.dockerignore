@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+node_modules
+npm-debug.log*
+coverage
+tests
+data
+config
+__CRIO__
+.git
+.github
+Dockerfile*
+README.md

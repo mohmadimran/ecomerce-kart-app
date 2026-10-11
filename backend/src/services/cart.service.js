@@ -102,7 +102,7 @@ const mongoose = require("mongoose");
     }
   
     // 5. Check if product is already in cart
-    const normalizedProductId = productId.toLowerCase();
+    const normalizedProductId = String(productId).toLowerCase();
     const itemIndex = cart.cartItems.findIndex(
       (item) => item.product._id.toString() === normalizedProductId
     );
@@ -130,7 +130,7 @@ const mongoose = require("mongoose");
       throw new ApiError(httpStatus.BAD_REQUEST, "Cart not found");
     }
   
-    const normalizedProductId = productId.toLowerCase();
+    const normalizedProductId = String(productId).toLowerCase();
     const itemIndex = cart.cartItems.findIndex(
       (item) => item.product._id.toString() === normalizedProductId
     );
@@ -157,7 +157,7 @@ const mongoose = require("mongoose");
      throw new ApiError(httpStatus.BAD_REQUEST, "User does not have a cart");
    }
  
-   const normalizedProductId = productId.toLowerCase();
+   const normalizedProductId = String(productId).toLowerCase();
    const itemIndex = cart.cartItems.findIndex(
      (item) => item.product._id.toString() === normalizedProductId
    );

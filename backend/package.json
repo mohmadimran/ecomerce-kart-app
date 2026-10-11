@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
+    "check": "node scripts/check-syntax.js",
     "test": "jest --runInBand"
   },
   "dependencies": {

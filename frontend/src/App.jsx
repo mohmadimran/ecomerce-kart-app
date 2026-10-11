@@ -9,10 +9,6 @@ import Search from "./components/Search";
 import Checkout from "./components/Checkout";
 import Thanks from "./components/Thanks";
 
-export const config = {
-endpoint:"https://ecomerce-kart-app.onrender.com/v1",
-};
-
 export default function App() {
   const location = useLocation();
 

@@ -1,7 +1,7 @@
 import { Input, message, Row, Col } from "antd";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { config } from "../App";
+import { config } from "../config";
 import Cart from "./Cart";
 import Header from "./Header";
 import Product from "./Product";
@@ -28,8 +28,10 @@ const Search = () => {
   const navigate = useNavigate();
   
   // State variables
-  const [loading, setLoading] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loggedIn] = useState(
+    () => Boolean(localStorage.getItem("email") && localStorage.getItem("token"))
+  );
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [products, setProducts] = useState([]);
   
@@ -37,13 +39,6 @@ const Search = () => {
   const cartRef = useRef(null);
   const debounceTimeout = useRef(0);
 
-  /**
-   * Check the response of the API call to be valid and handle any failures along the way
-   *
-   * @param {boolean} errored - Represents whether an error occurred in the process of making the API call itself
-   * @param {Product[]|{ success: boolean, message: string }} response - The response JSON object
-   * @returns {boolean} Whether validation has passed or not
-   */
   const validateResponse = useCallback((errored, response) => {
     if (errored || (!response.length && !response.message)) {
       message.error(
@@ -60,42 +55,6 @@ const Search = () => {
     return true;
   }, []);
 
-  /**
-   * Perform the API call over the network and return the response
-   *
-   * @returns {Promise<Product[]|undefined>} The response JSON object
-   */
-  const performAPICall = useCallback(async () => {
-    let response = {};
-    let errored = false;
-
-    setLoading(true);
-
-    try {
-      const res = await fetch(`${config.endpoint}/products`);
-      response = await res.json();
-    } catch (e) {
-      errored = true;
-    }
-
-    setLoading(false);
-
-    if (validateResponse(errored, response)) {
-      return response;
-    }
-  }, [validateResponse]);
-
-  /**
-   * Function to fetch list of products from backend and update state variable
-   */
-  const getProducts = useCallback(async () => {
-    const response = await performAPICall();
-
-    if (response) {
-      setProducts(response);
-      setFilteredProducts(response.slice());
-    }
-  }, [performAPICall]);
 
   /**
    * Definition for search handler
@@ -156,12 +115,33 @@ const Search = () => {
 
   // ComponentDidMount equivalent - Fetch products and check login status
   useEffect(() => {
-    getProducts();
+    let active = true;
 
-    if (localStorage.getItem("email") && localStorage.getItem("token")) {
-      setLoggedIn(true);
-    }
-  }, [getProducts]);
+    const loadProducts = async () => {
+      let response = {};
+      let errored = false;
+
+      try {
+        const res = await fetch(config.endpoint + "/products");
+        response = await res.json();
+      } catch {
+        errored = true;
+      }
+
+      if (!active) return;
+      setLoading(false);
+
+      if (validateResponse(errored, response)) {
+        setProducts(response);
+        setFilteredProducts(response.slice());
+      }
+    };
+
+    void loadProducts();
+    return () => {
+      active = false;
+    };
+  }, [validateResponse]);
 
   // Cleanup timeout on unmount
   useEffect(() => {

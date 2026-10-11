@@ -1,6 +1,7 @@
 const httpStatus = require("http-status").default;
 const { userOne, userTwo } = require("../fixtures/user.fixture");
-const { Cart } = require("../../src/models");
+const mongoose = require("mongoose");
+const { Cart, User, Product } = require("../../src/models");
 const { cartService } = require("../../src/services");
 const {
   cartWithProductsUserOne,
@@ -16,6 +17,15 @@ describe("Cart test", () => {
   // Reset any mocked objects after each individual test
   beforeEach(() => {
     mockingoose.resetAll();
+    jest.spyOn(mongoose, "startSession").mockResolvedValue({
+      withTransaction: async (callback) => callback(),
+      endSession: jest.fn(),
+    });
+    mockingoose(User).toReturn(userOne, "findOne");
+    mockingoose(Product).toReturn([
+      { _id: "5f71c1ca04c69a5874e9fd45", cost: 20 },
+    ], "find");
+    mockingoose(User).toReturn({ matchedCount: 0 }, "updateOne");
   });
 
   // Tests for checking checkout functionality
@@ -69,6 +79,7 @@ describe("Cart test", () => {
       expect(userTwo.address).toEqual(config.default_address);
 
       mockingoose(Cart).toReturn(cartWithProductsUserTwo, "findOne");
+      mockingoose(User).toReturn(userTwo, "findOne");
 
       // create a mock function for User model's hasSetNonDefaultAddress() instance method
       const hasSetNonDefaultAddressMock = jest.fn();
@@ -111,16 +122,10 @@ describe("Cart test", () => {
     });
 
     it("should update user balance and empty the cart on success", async () => {
-      let userOneFinal = { ...userOne };
-
-      // Mock the save() method on userOneFinal as it's not an instance of User object
-      userOneFinal.save = jest.fn();
-
-      // create a mock function for User model's hasSetNonDefaultAddress() instance method
-      const hasSetNonDefaultAddressMock = jest.fn();
-      userOneFinal.hasSetNonDefaultAddress = hasSetNonDefaultAddressMock.mockReturnValue(
-        true
-      );
+      jest.spyOn(User.prototype, "hasSetNonDefaultAddress").mockReturnValue(true);
+      const updateUserMock = jest
+        .spyOn(User, "updateOne")
+        .mockResolvedValue({ matchedCount: 1 });
 
       // define a mock object for `cart.save()` call - assert saved Cart object
       let cartSaveMock = (...args) => {
@@ -132,16 +137,18 @@ describe("Cart test", () => {
       // Return `cartSaveMock` object on calling `save()` function of Cart model
       mockingoose(Cart).toReturn(cartSaveMock, "save");
       mockingoose(Cart).toReturn(cartWithProductsUserOne, "findOne");
+      mockingoose(User).toReturn(userOne, "findOne");
+      mockingoose(User).toReturn({ matchedCount: 1 }, "updateOne");
 
       // Call the method to be tested - `checkout()`
-      await cartService.checkout(userOneFinal);
+      await cartService.checkout(userOne);
 
-      // Assert User model's hasSetNonDefaultAddress() instance method was called
-      expect(hasSetNonDefaultAddressMock.mock.calls.length).not.toBe(0);
-
-      // TODO: CRIO_TASK_MODULE_TEST - Assert that the wallet balance of user was reduced
-      //  expect(true).toEqual(false);
-      expect(userOneFinal.walletMoney).toBeLessThan(userOne.walletMoney);
+      expect(User.prototype.hasSetNonDefaultAddress).toHaveBeenCalled();
+      expect(updateUserMock).toHaveBeenCalledWith(
+        expect.objectContaining({ _id: userOne._id }),
+        { $inc: { walletMoney: -40 } },
+        expect.objectContaining({ session: expect.anything() })
+      );
     });
   });
 });

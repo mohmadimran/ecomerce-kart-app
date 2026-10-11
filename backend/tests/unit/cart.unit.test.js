@@ -18,9 +18,9 @@ describe("Cart test", () => {
   describe("GET cart", () => {
     it("should call findOne method", async () => {
       mockingoose(Cart).toReturn(emptyCart, "findOne");
-      let res = await cartService.getCartByUser(userOne);
+      const res = await cartService.getCartByUser(userOne);
 
-      expect(res.toJSON()).toEqual(emptyCart);
+      expect(res).toEqual(emptyCart);
     });
 
     it("should throw error if user does not have a cart", async () => {

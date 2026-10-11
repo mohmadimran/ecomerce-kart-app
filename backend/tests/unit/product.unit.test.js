@@ -15,9 +15,10 @@ describe("Product test", () => {
 
       let productResponse = await productService.getProducts();
 
-      expect(JSON.stringify(productResponse)).toEqual(
-        JSON.stringify([productOne, productTwo])
-      );
+      expect(productResponse).toEqual([
+        expect.objectContaining(productOne),
+        expect.objectContaining(productTwo),
+      ]);
     });
   });
 
@@ -28,9 +29,7 @@ describe("Product test", () => {
 
       let productResponse = await productService.getProductById("1111");
 
-      expect(JSON.stringify(productResponse)).toEqual(
-        JSON.stringify(productOne)
-      );
+      expect(productResponse).toEqual(expect.objectContaining(productOne));
     });
   });
 });

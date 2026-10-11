@@ -3,7 +3,7 @@ import { Button, Input, message } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { config } from "../App";
+import { config } from "../config";
 import Footer from "./Footer";
 import Header from "./Header";
 
