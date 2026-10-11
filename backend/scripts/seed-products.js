@@ -121,6 +121,7 @@ const seedProducts = async () => {
 
   try {
     let insertedCount = 0;
+    let repairedImageCount = 0;
     for (const product of catalogProducts) {
       const { _id } = product;
       if (_id) {
@@ -148,14 +149,25 @@ const seedProducts = async () => {
           name: product.name,
           category: product.category,
         });
-        if (existingProduct) continue;
+        if (existingProduct) {
+          if (existingProduct.image === "google.com") {
+            const result = await Product.updateOne(
+              { _id: existingProduct._id, image: "google.com" },
+              { $set: { image: product.image } }
+            );
+            repairedImageCount += result.modifiedCount;
+          }
+          continue;
+        }
       }
 
       await Product.create(product);
       insertedCount += 1;
     }
 
-    console.info(`Product seed complete: inserted ${insertedCount} missing products.`);
+    console.info(
+      `Product seed complete: inserted ${insertedCount} missing products and repaired ${repairedImageCount} legacy product images.`
+    );
   } finally {
     await mongoose.disconnect();
   }

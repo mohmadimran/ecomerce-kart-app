@@ -21,6 +21,12 @@ body {
   font-family: "Montserrat", sans-serif;
 }
 
+.route-loading {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+}
+
 .input-field {
   margin-bottom: 1em !important;
 }

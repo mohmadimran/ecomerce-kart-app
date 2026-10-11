@@ -6,7 +6,11 @@ export default function Product(props) {
   return (
     <Card className="product" hoverable>
 
-      <img className="product-image" alt="product" src={props.product.image} />
+      <img
+        className="product-image"
+        alt={props.product.name}
+        src={props.product.image}
+      />
 
       <div className="product-info">
 
