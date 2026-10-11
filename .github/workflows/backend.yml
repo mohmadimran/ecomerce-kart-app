@@ -64,7 +64,7 @@ jobs:
 
       - name: Run backend integration tests
         working-directory: backend
-        run: npm test -- --runTestsByPath tests/integration
+        run: npm test -- --testPathPatterns=tests/integration
         env:
           NODE_ENV: test
           MONGODB_URL: mongodb://127.0.0.1:27017/qkart?replicaSet=rs0
