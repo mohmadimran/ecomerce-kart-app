@@ -22,7 +22,9 @@ const validate = (schema) => (req, res, next) => {
   const validSchema = pick(schema, ["params", "query", "body"]);
 
   // cherry-pick from the request object ["params", "query", "body"] fields
-  const object = pick(req, Object.keys(validSchema));
+  const object = Object.fromEntries(
+    Object.keys(validSchema).map((key) => [key, req[key]])
+  );
 
   // Compile schema to Joi schema object and validate the request object
   const { value, error } = Joi.compile(validSchema)
