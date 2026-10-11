@@ -56,7 +56,7 @@ To add the repeatable sample catalog to the configured database, run this from `
 npm run seed:products
 ```
 
-The seed command inserts only missing sample products and leaves existing product records unchanged. Set `MONGODB_URL` to the database you intend to populate before running it.
+The seed command inserts only missing original and sample products and leaves existing product records unchanged. Set `MONGODB_URL` to the database you intend to populate before running it.
 
 ### 2. Configure and start the storefront
 
