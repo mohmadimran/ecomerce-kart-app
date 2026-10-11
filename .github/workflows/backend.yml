@@ -67,6 +67,7 @@ jobs:
         run: |
           node <<'NODE'
           const mongoose = require("mongoose");
+          const config = require("./src/config/config");
           const delay = (milliseconds) =>
             new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -75,7 +76,8 @@ jobs:
 
             for (let attempt = 1; attempt <= 30; attempt += 1) {
               try {
-                await mongoose.connect(process.env.MONGODB_URL, {
+                await mongoose.connect(config.mongoose.url, {
+                  ...config.mongoose.options,
                   serverSelectionTimeoutMS: 2000,
                 });
                 const hello = await mongoose.connection.db.admin().command({ hello: 1 });
