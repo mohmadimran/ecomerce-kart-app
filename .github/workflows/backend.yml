@@ -62,6 +62,50 @@ jobs:
           echo "MongoDB replica set did not become primary in time."
           exit 1
 
+      - name: Verify MongoDB is reachable from the runner
+        working-directory: backend
+        run: |
+          node <<'NODE'
+          const mongoose = require("mongoose");
+          const delay = (milliseconds) =>
+            new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+          (async () => {
+            let lastError;
+
+            for (let attempt = 1; attempt <= 30; attempt += 1) {
+              try {
+                await mongoose.connect(process.env.MONGODB_URL, {
+                  serverSelectionTimeoutMS: 2000,
+                });
+                const hello = await mongoose.connection.db.admin().command({ hello: 1 });
+
+                if (hello.setName !== "rs0" || !hello.isWritablePrimary) {
+                  throw new Error("MongoDB is reachable but is not the rs0 primary.");
+                }
+
+                await mongoose.disconnect();
+                console.log("MongoDB replica set is reachable from the runner.");
+                return;
+              } catch (error) {
+                lastError = error;
+                await mongoose.disconnect();
+                await delay(1000);
+              }
+            }
+
+            throw new Error("MongoDB replica set did not become reachable from the runner.", {
+              cause: lastError,
+            });
+          })().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+          });
+          NODE
+        env:
+          NODE_ENV: test
+          MONGODB_URL: mongodb://127.0.0.1:27017/qkart?replicaSet=rs0
+
       - name: Run backend integration tests
         working-directory: backend
         run: npm test -- --testPathPatterns=tests/integration
