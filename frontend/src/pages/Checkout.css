@@ -1,8 +1,6 @@
 .checkout-shipping {
   padding: 2em clamp(1rem, 3vw, 2em);
-  /* Reduce 70px of header and 100px of footer
-  ** Make footer display at bottom even if less content on main page
-  */
+
   min-height: calc(100vh - 170px);
 }
 .checkout-container {
@@ -23,7 +21,6 @@
   margin-right: 20px;
   margin-bottom: 20px;
 
-  /* height: 100%; */
 }
 .address-box {
   display: flex;
@@ -55,7 +52,7 @@ label.ant-radio-button-wrapper {
   height: 2.5em;
 }
 .checkout-cart {
-  /* height: 100vh; */
+
   background: #f6f8fa;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
 }

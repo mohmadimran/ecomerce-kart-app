@@ -1,40 +1,20 @@
-import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Input, message } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { config } from "../config";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
-export default function Register() {
+export default function Login() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
-  /**
-   * Validate user input
-   */
   const validateInput = () => {
-    if (!username.trim()) {
-      message.error("Username is a required field");
-      return false;
-    }
-
-    if (username.length < 6) {
-      message.error("Username must be at least 6 characters");
-      return false;
-    }
-
-    if (username.length > 32) {
-      message.error("Username must be at most 32 characters");
-      return false;
-    }
-
     if (!email.trim()) {
       message.error("Email is a required field");
       return false;
@@ -45,27 +25,9 @@ export default function Register() {
       return false;
     }
 
-    if (password.length < 8) {
-      message.error("Password must be at least 8 characters");
-      return false;
-    }
-
-    if (password.length > 32) {
-      message.error("Password must be at most 32 characters");
-      return false;
-    }
-
-    if (password !== confirmPassword) {
-      message.error("Passwords do not match");
-      return false;
-    }
-
     return true;
   };
 
-  /**
-   * Validate API response
-   */
   const validateResponse = (errored, response) => {
     if (errored || (!response?.tokens && !response?.message)) {
       message.error(
@@ -82,9 +44,6 @@ export default function Register() {
     return true;
   };
 
-  /**
-   * Register API
-   */
   const performAPICall = async () => {
     let response = {};
     let errored = false;
@@ -92,13 +51,12 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${config.endpoint}/auth/register`, {
+      const res = await fetch(`${config.endpoint}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: username,
           email,
           password,
         }),
@@ -119,47 +77,49 @@ export default function Register() {
     return null;
   };
 
-  /**
-   * Register handler
-   */
-  const register = async () => {
+  const persistLogin = (token, email, balance, name, userId) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("email", email);
+    localStorage.setItem("balance", balance);
+    localStorage.setItem("username", name);
+    localStorage.setItem("userId", userId);
+  };
+
+  const login = async () => {
     if (!validateInput()) return;
 
     const response = await performAPICall();
 
     if (!response) return;
 
-    setUsername("");
+    persistLogin(
+      response.tokens.access.token,
+      response.user.email,
+      response.user.walletMoney,
+      response.user.name,
+      response.user._id
+    );
+
     setEmail("");
     setPassword("");
-    setConfirmPassword("");
 
-    message.success("Registered successfully");
+    message.success("Logged in successfully");
 
-    navigate("/login");
+    navigate("/products");
   };
 
   return (
     <>
-      {/* Header */}
-      <Header navigate={navigate} />
 
-      {/* Register Form */}
+      <Header />
+
       <div className="flex-container">
-        <div className="register-container container">
-          <h1>Make an account</h1>
+        <div className="login-container container">
+          <h1>Login to QKart</h1>
 
           <Input
             className="input-field"
             prefix={<UserOutlined />}
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-
-          <Input
-            className="input-field"
-            prefix={<MailOutlined />}
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -171,29 +131,20 @@ export default function Register() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <Input.Password
-            className="input-field"
-            prefix={<LockOutlined />}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            onPressEnter={register}
+            onPressEnter={login}
           />
 
           <Button
             type="primary"
             loading={loading}
-            onClick={register}
+            onClick={login}
             block
           >
-            Register
+            Login
           </Button>
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </>
   );

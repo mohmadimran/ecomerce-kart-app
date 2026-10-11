@@ -1,20 +1,17 @@
 import { Button } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import Header from "./Header";
+import Header from "../components/Header";
 import "./Thanks.css";
 
 export default function Thanks() {
-  const navigate = useNavigate();
-
   const balance = localStorage.getItem("balance") || "0";
 
   return (
     <>
-      {/* Header */}
-      <Header navigate={navigate} />
 
-      {/* Order Details */}
+      <Header />
+
       <div className="thanks-container">
         <h1 style={{ fontWeight: 600 }}>It's ordered!</h1>
 

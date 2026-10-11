@@ -2,40 +2,22 @@ import { Input, message, Row, Col } from "antd";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "../config";
-import Cart from "./Cart";
-import Header from "./Header";
-import Product from "./Product";
-import Footer from "./Footer";
-import "./Search.css";
+import Cart from "../components/Cart";
+import Header from "../components/Header";
+import Product from "../components/Product";
+import Footer from "../components/Footer";
+import "./Products.css";
 
-/**
- * @typedef {Object} Product
- * @property {string} name - The name or title of the product
- * @property {string} category - The category that the product belongs to
- * @property {number} cost - The price to buy the product
- * @property {number} rating - The aggregate rating of the product (integer out of five)
- * @property {string} image - Contains URL for the product image
- * @property {string} _id - Unique ID for the product
- */
-
-/**
- * Search component handles the Products list page UI and functionality
- * 
- * @param {Object} props - Component props
- * @param {Object} props.history - React Router history object (legacy, useNavigate instead)
- */
-const Search = () => {
+const Products = () => {
   const navigate = useNavigate();
-  
-  // State variables
+
   const [loading, setLoading] = useState(true);
   const [loggedIn] = useState(
     () => Boolean(localStorage.getItem("email") && localStorage.getItem("token"))
   );
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [products, setProducts] = useState([]);
-  
-  // Refs
+
   const cartRef = useRef(null);
   const debounceTimeout = useRef(0);
 
@@ -55,13 +37,6 @@ const Search = () => {
     return true;
   }, []);
 
-
-  /**
-   * Definition for search handler
-   * This is the function that is called when the user clicks on the search button or the debounce timer is executed
-   *
-   * @param {string} text - Search bar input query text
-   */
   const search = useCallback((text) => {
     setFilteredProducts(
       products.filter(
@@ -72,12 +47,6 @@ const Search = () => {
     );
   }, [products]);
 
-  /**
-   * Definition for debounce handler
-   * This is the function that is called whenever the user types or changes the text in the searchbar field
-   *
-   * @param {{ target: { value: string } }} event - JS event object emitted from the search input field
-   */
   const debounceSearch = useCallback((event) => {
     const value = event.target.value;
 
@@ -90,12 +59,6 @@ const Search = () => {
     }, 300);
   }, [search]);
 
-  /**
-   * Creates the responsive view for a product item
-   *
-   * @param {Product} product - The product object
-   * @returns {JSX.Element} HTML and JSX to be rendered
-   */
   const getProductElement = useCallback((product) => {
     return (
       <Col xs={24} sm={12} xl={6} key={product._id}>
@@ -113,7 +76,6 @@ const Search = () => {
     );
   }, [loggedIn, navigate]);
 
-  // ComponentDidMount equivalent - Fetch products and check login status
   useEffect(() => {
     let active = true;
 
@@ -143,7 +105,6 @@ const Search = () => {
     };
   }, [validateResponse]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceTimeout.current) {
@@ -154,7 +115,7 @@ const Search = () => {
 
   return (
     <>
-      {/* Display Header with Search bar */}
+
       <Header>
         <Input.Search
           placeholder="Search"
@@ -164,15 +125,14 @@ const Search = () => {
         />
       </Header>
 
-      {/* Use Antd Row/Col components to display products and cart as columns in the same row*/}
       <Row>
-        {/* Display products */}
+
         <Col
           xs={{ span: 24 }}
           md={{ span: loggedIn && products.length ? 18 : 24 }}
         >
           <div className="search-container">
-            {/* Display each product item wrapped in a Col component */}
+
             <Row>
               {products.length !== 0 ? (
                 filteredProducts.map((product) => getProductElement(product))
@@ -185,7 +145,6 @@ const Search = () => {
           </div>
         </Col>
 
-        {/* Display cart */}
         {loggedIn && products.length && (
           <Col xs={{ span: 24 }} md={{ span: 6 }} className="search-cart">
             <div>
@@ -193,16 +152,16 @@ const Search = () => {
                 ref={cartRef}
                 products={products}
                 token={localStorage.getItem("token")}
+                navigate={navigate}
               />
             </div>
           </Col>
         )}
       </Row>
 
-      {/* Display the footer */}
       <Footer />
     </>
   );
 };
 
-export default Search;
+export default Products;
