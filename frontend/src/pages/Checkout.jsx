@@ -1,5 +1,4 @@
-import { Button, message, Radio, Row, Col } from "antd";
-import TextArea from "antd/lib/input/TextArea";
+import { Button, Input, message, Radio, Row, Col } from "antd";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "../config";
@@ -246,7 +245,7 @@ const Checkout = () => {
                 <div className="checkout-row">
 
                   <div>
-                    <TextArea
+                    <Input.TextArea
                       className="new-address"
                       placeholder={address ? "Update Address" : "Add new address"}
                       rows={4}
